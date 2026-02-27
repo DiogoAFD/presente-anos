@@ -1,6 +1,5 @@
 const question = document.getElementById("question");
 const yesBtn = document.getElementById("yesBtn");
-const noBtn = document.getElementById("noBtn");
 const buttons = document.getElementById("buttons");
 const countdownEl = document.getElementById("countdown");
 const music = document.getElementById("bgMusic");
@@ -10,7 +9,7 @@ const startScreen = document.getElementById("startScreen");
 const startBtn = document.getElementById("startBtn");
 
 startBtn.addEventListener("click", () => {
-    unlockAudio(); // já tens esta função
+    unlockAudio();
 
     // fade out suave
     startScreen.classList.add("hidden");
@@ -38,8 +37,8 @@ function unlockAudio() {
                     sound.currentTime = 0;
                     sound.volume = 1;
                 })
-                .catch(() => {});
-        } catch (e) {}
+                .catch(() => { });
+        } catch (e) { }
     });
 
     audioUnlocked = true;
@@ -48,38 +47,6 @@ function unlockAudio() {
 document.addEventListener("click", unlockAudio, { once: true });
 
 let escapeCount = 0;
-
-/* ===============================
-   BOTÃO NÃO (foge só 3 vezes)
-================================= */
-
-noBtn.addEventListener("mouseenter", () => {
-    if (escapeCount < 3) {
-        moveNoButton();
-        growYesButton();
-        escapeCount++;
-    }
-});
-
-noBtn.addEventListener("click", () => {
-    playNoSound();
-    vibrate(200);
-    question.innerHTML = "Olha que essa resposta é ilegal 👀";
-});
-
-function moveNoButton() {
-    playSooshSound();
-
-    const maxX = window.innerWidth - noBtn.offsetWidth - 20;
-    const maxY = window.innerHeight - noBtn.offsetHeight - 20;
-
-    const x = Math.random() * maxX;
-    const y = Math.random() * maxY;
-
-    noBtn.style.position = "fixed";
-    noBtn.style.left = `${x}px`;
-    noBtn.style.top = `${y}px`;
-}
 
 function growYesButton() {
     const currentSize = window.getComputedStyle(yesBtn).fontSize;
@@ -91,27 +58,123 @@ function growYesButton() {
    BOTÃO SIM → QUIZ
 ================================= */
 
-yesBtn.addEventListener("click", startQuiz);
+let escapeSimCount = 0;
+const maxEscapeSim = 7; // Depois de 7 tentativas, o botão para de fugir
+
+yesBtn.addEventListener("mouseenter", () => {
+    if (escapeSimCount < maxEscapeSim) {
+        moveYesButton();
+        growYesButton();
+        playSooshSound();
+        escapeSimCount++;
+    }
+});
+
+yesBtn.addEventListener("click", () => {
+    if (escapeSimCount >= maxEscapeSim) {
+        startQuiz(); // Avança para o quiz normalmente
+    } else {
+        question.innerHTML = "Quase lá 😏 tenta outra vez!";
+        vibrate(150);
+    }
+});
+
+function moveYesButton() {
+    const maxX = window.innerWidth - yesBtn.offsetWidth - 20;
+    const maxY = window.innerHeight - yesBtn.offsetHeight - 20;
+
+    const x = Math.random() * maxX;
+    const y = Math.random() * maxY;
+
+    yesBtn.style.position = "fixed";
+    yesBtn.style.left = `${x}px`;
+    yesBtn.style.top = `${y}px`;
+}
 
 function startQuiz() {
-    question.innerHTML = "Pergunta importante... quem merece este voucher? 😌";
+    question.innerHTML = "Pergunta importante... quem merece esta prenda? 😌";
 
     buttons.innerHTML = `
-    <button class="quizOption correct">Eu obviamente 💅</button>
-    <button class="quizOption">A vizinha</button>
-    <button class="quizOption">O carteiro</button>
-  `;
+        <button class="quizOption correct" style="background-color: #4CAF50; color: white;">Eu obviamente 💅</button>
+        <button class="quizOption funny" style="background-color: #ff66a3; color: white;">O meu incrível namorado 😎</button>
+        <button class="quizOption playful" style="background-color: #ffcc66; color: black;">Eu outra vez porque quem mais haveria de ser... 😏</button>
+    `;
+
+    let playfulEscapes = 0;
+    const maxPlayfulEscapes = 5;
 
     document.querySelectorAll(".quizOption").forEach(btn => {
         btn.addEventListener("click", (e) => {
             if (e.target.classList.contains("correct")) {
-                stageTwo();
-            } else {
+                // Antes de avançar, faz o botão tremer
+                e.target.style.animation = "shake 0.5s";
+                setTimeout(() => {
+                    e.target.style.animation = "";
+                    stageTwo();
+                }, 500);
+            }
+            else if (e.target.classList.contains("funny")) {
+                // Explode visualmente
+                explodeBoyfriendButton(e.target);
                 playNoSound();
-                question.innerHTML = "Resposta errada 👀 tenta outra vez.";
+            }
+            else if (e.target.classList.contains("playful")) {
+                if (playfulEscapes < maxPlayfulEscapes) {
+                    // Pula para outro lugar
+                    movePlayfulButton(e.target);
+                    playSooshSound();
+                    playfulEscapes++;
+                    question.innerHTML = "Ahah 😏 quase apanhas-te!";
+                } else {
+                    // Agora fica clicável
+                    question.innerHTML = "Ok, agora podes clicar!";
+                    e.target.style.position = "static";
+                    e.target.style.left = "";
+                    e.target.style.top = "";
+                }
             }
         });
     });
+}
+
+function movePlayfulButton(btn) {
+    const maxX = window.innerWidth - btn.offsetWidth - 20;
+    const maxY = window.innerHeight - btn.offsetHeight - 20;
+
+    const x = Math.random() * maxX;
+    const y = Math.random() * maxY;
+
+    btn.style.position = "fixed";
+    btn.style.left = `${x}px`;
+    btn.style.top = `${y}px`;
+}
+
+function explodeBoyfriendButton(btn) {
+    if (!btn || btn.classList.contains("exploding")) return;
+
+    question.innerHTML = "Resposta errada 👀 tenta outra vez.";
+
+    btn.classList.add("exploding");
+    btn.disabled = true;
+
+    let scale = 1;
+
+    const grow = setInterval(() => {
+        scale += 0.15;
+        btn.style.transform = `scale(${scale})`;
+
+        if (scale >= 3) {
+            clearInterval(grow);
+
+            btn.style.transition = "0.3s ease";
+            btn.style.opacity = "0";
+            btn.style.transform = "scale(4)";
+
+            setTimeout(() => {
+                btn.remove();
+            }, 300);
+        }
+    }, 80);
 }
 
 /* ===============================
@@ -215,11 +278,11 @@ function showFinalVoucher() {
     question.classList.remove("dramatic");
 
     question.innerHTML =
-        "Sabia 😌 Porque tu mereces um dia só para ti 💅💆‍♀️";
+        "Feliz aniversário 💛";
 
     // Botão que força download
     buttons.innerHTML = `
-      <button id="downloadBtn">🎁 Desbloquear Voucher</button>
+      <button id="downloadBtn">🎁 Desbloquear Prenda</button>
     `;
     buttons.classList.remove("hidden");
     createHearts();
@@ -273,7 +336,7 @@ function playNoSound() {
 }
 
 function playSooshSound() {
-     if (!swooshSound) {
+    if (!swooshSound) {
         console.log("Swoosh não encontrado");
         return;
     }
