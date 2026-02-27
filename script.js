@@ -63,7 +63,7 @@ function revealSurprise() {
   countdownEl.classList.add("hidden");
 
   buttons.innerHTML = `
-    <a href="GIFT Voucher 2875.pdf" download>
+    <a href="GIFT Vouche 2875.pdf" download>
       <button>🎁 Desbloquear Voucher</button>
     </a>
   `;
@@ -89,4 +89,5 @@ function createHearts() {
     }, 5000);
 
   }, 300);
+
 }
