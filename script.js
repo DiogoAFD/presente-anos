@@ -4,90 +4,228 @@ const noBtn = document.getElementById("noBtn");
 const buttons = document.getElementById("buttons");
 const countdownEl = document.getElementById("countdown");
 const music = document.getElementById("bgMusic");
+const noSound = document.getElementById("noSound");
 
-let noClicks = 0;
+let escapeCount = 0;
 
-/* Música começa ao primeiro clique */
-document.body.addEventListener("click", () => {
-  music.play().catch(() => {});
-}, { once: true });
+/* ===============================
+   BOTÃO NÃO (foge só 3 vezes)
+================================= */
 
-/* Botão NÃO foge do rato */
-noBtn.addEventListener("mouseover", () => {
-  const x = Math.random() * (window.innerWidth - 100);
-  const y = Math.random() * (window.innerHeight - 50);
-  noBtn.style.position = "absolute";
-  noBtn.style.left = `${x}px`;
-  noBtn.style.top = `${y}px`;
-});
-
-/* Clique no NÃO */
-noBtn.addEventListener("click", () => {
-  noClicks++;
-
-  if (noClicks === 1) {
-    question.innerHTML = "Tens a certeza absoluta mesmo mesmo? 🤨";
-  } else if (noClicks === 2) {
-    question.innerHTML = "Hmm… vou fingir que não ouvi isso 👀";
-  } else {
-    question.innerHTML = "Resposta incorreta 😌 tenta outra vez.";
-  }
-});
-
-/* Clique no SIM */
-yesBtn.addEventListener("click", () => {
-  startCountdown();
-});
-
-/* Countdown dramático */
-function startCountdown() {
-  buttons.classList.add("hidden");
-  countdownEl.classList.remove("hidden");
-
-  let count = 3;
-
-  const interval = setInterval(() => {
-    countdownEl.innerHTML = `A preparar surpresa em... ${count} 💖`;
-    count--;
-
-    if (count < 0) {
-      clearInterval(interval);
-      revealSurprise();
+noBtn.addEventListener("mouseenter", () => {
+    if (escapeCount < 3) {
+        moveNoButton();
+        growYesButton();
+        escapeCount++;
     }
-  }, 1000);
+});
+
+noBtn.addEventListener("click", () => {
+    playNoSound();
+    vibrate(200);
+    question.innerHTML = "Olha que essa resposta é ilegal 👀";
+});
+
+function moveNoButton() {
+    const maxX = window.innerWidth - noBtn.offsetWidth - 20;
+    const maxY = window.innerHeight - noBtn.offsetHeight - 20;
+
+    const x = Math.random() * maxX;
+    const y = Math.random() * maxY;
+
+    noBtn.style.position = "fixed";
+    noBtn.style.left = `${x}px`;
+    noBtn.style.top = `${y}px`;
 }
 
-/* Revelação final */
-function revealSurprise() {
-  question.innerHTML = "Sabia 😌 Porque tu mereces um dia só para ti 💅💆‍♀️";
-  countdownEl.classList.add("hidden");
+function growYesButton() {
+    const currentSize = window.getComputedStyle(yesBtn).fontSize;
+    const newSize = parseFloat(currentSize) + 4;
+    yesBtn.style.fontSize = newSize + "px";
+}
 
-  buttons.innerHTML = `
-    <a href="GIFT Vouche 2875.pdf" download>
+/* ===============================
+   BOTÃO SIM → QUIZ
+================================= */
+
+yesBtn.addEventListener("click", startQuiz);
+
+function startQuiz() {
+    question.innerHTML = "Pergunta importante... quem merece este voucher? 😌";
+
+    buttons.innerHTML = `
+    <button class="quizOption correct">Eu obviamente 💅</button>
+    <button class="quizOption">A vizinha</button>
+    <button class="quizOption">O carteiro</button>
+  `;
+
+    document.querySelectorAll(".quizOption").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            if (e.target.classList.contains("correct")) {
+                stageTwo();
+            } else {
+                playNoSound();
+                question.innerHTML = "Resposta errada 👀 tenta outra vez.";
+            }
+        });
+    });
+}
+
+/* ===============================
+   ETAPAS INTERMÉDIAS
+================================= */
+
+function stageTwo() {
+    question.innerHTML = "Mas espera... tens a certeza que mereces MESMO? 😏";
+
+    buttons.innerHTML = `
+    <button id="proveBtn">Provar que sim 💅</button>
+  `;
+
+    document.getElementById("proveBtn")
+        .addEventListener("click", stageThree);
+}
+
+function stageThree() {
+    question.innerHTML = "Última pergunta importante...";
+
+    buttons.innerHTML = `
+    <button id="finalBtn">
+      Aceitar oficialmente que sou incrível ✨
+    </button>
+  `;
+
+    document.getElementById("finalBtn")
+        .addEventListener("click", startCountdown);
+}
+
+/* ===============================
+   COUNTDOWN + MÚSICA
+================================= */
+
+function startCountdown() {
+    const overlay = document.getElementById("overlay");
+    overlay.classList.add("active");
+    question.classList.add("dramatic");
+
+    buttons.classList.add("hidden");
+    countdownEl.classList.remove("hidden");
+
+    // 🔥 música começa aqui e só aqui
+    music.currentTime = 0;
+    music.volume = 0;
+    music.play().catch(() => { });
+
+    let fade = setInterval(() => {
+        if (music.volume < 0.8) {
+            music.volume += 0.05;
+        } else {
+            clearInterval(fade);
+        }
+    }, 200);
+
+    let count = 3;
+
+    const interval = setInterval(() => {
+        if (count > 0) {
+            countdownEl.innerHTML = `A preparar surpresa em... ${count} 💖`;
+            count--;
+        } else {
+            clearInterval(interval);
+            countdownEl.classList.add("hidden");
+            countdownEl.innerHTML = "";
+            revealSurprise();
+        }
+    }, 1000);
+}
+
+/* ===============================
+   CARTA
+================================= */
+
+function revealSurprise() {
+    question.innerHTML = "Abre a carta 💌";
+
+    const envelope = document.createElement("div");
+    envelope.classList.add("envelope");
+
+    document.querySelector(".card").appendChild(envelope);
+
+    envelope.addEventListener("click", () => {
+        envelope.classList.add("open");
+
+        setTimeout(() => {
+            envelope.remove();
+            showFinalVoucher();
+        }, 800);
+    });
+}
+
+/* ===============================
+   FINAL
+================================= */
+
+function showFinalVoucher() {
+    const overlay = document.getElementById("overlay");
+
+    // 🔥 remover modo dramático
+    overlay.classList.remove("active");
+    question.classList.remove("dramatic");
+
+    question.innerHTML =
+        "Sabia 😌 Porque tu mereces um dia só para ti 💅💆‍♀️";
+
+    buttons.innerHTML = `
+    <a href="GIFT Voucher 2875.pdf" download>
       <button>🎁 Desbloquear Voucher</button>
     </a>
   `;
-  buttons.classList.remove("hidden");
 
-  createHearts();
+    buttons.classList.remove("hidden");
+    createHearts();
 }
 
-/* Corações a cair */
-function createHearts() {
-  const heartsContainer = document.getElementById("hearts");
+/* ===============================
+   CORAÇÕES
+================================= */
 
-  setInterval(() => {
-    const heart = document.createElement("div");
-    heart.classList.add("heart");
-    heart.innerHTML = "💖";
-    heart.style.left = Math.random() * 100 + "vw";
-    heart.style.fontSize = Math.random() * 20 + 15 + "px";
-    heartsContainer.appendChild(heart);
+function createHearts() {
+    const heartsContainer = document.getElementById("hearts");
 
     setTimeout(() => {
-      heart.remove();
-    }, 5000);
+        const heartInterval = setInterval(() => {
+            const heart = document.createElement("div");
+            heart.classList.add("heart");
+            heart.innerHTML = "💖";
+            heart.style.left = Math.random() * 100 + "vw";
+            heart.style.fontSize = Math.random() * 20 + 15 + "px";
 
-  }, 300);
+            heartsContainer.appendChild(heart);
 
+            setTimeout(() => {
+                heart.remove();
+            }, 5000);
+
+        }, 200);
+
+        setTimeout(() => {
+            clearInterval(heartInterval);
+        }, 6000);
+
+    }, 1500); // ligeiro delay para bater com a música
+}
+
+/* ===============================
+   UTILITÁRIOS
+================================= */
+
+function playNoSound() {
+    noSound.currentTime = 0;
+    noSound.play().catch(() => { });
+}
+
+function vibrate(duration) {
+    if (navigator.vibrate) {
+        navigator.vibrate(duration);
+    }
 }

@@ -1,29 +1,36 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
-  <meta charset="UTF-8" />
-  <title>Uma Pergunta Muito Importante 👀</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8" />
+    <title>Uma Pergunta Muito Importante 👀</title>
+    <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
 
-  <audio id="bgMusic" loop>
-    <source src="Noah Kahan - All My Love.mp3" type="audio/mpeg">
-  </audio>
+    <audio id="bgMusic" loop>
+        <source src="Noah Kahan - All My Love.mp3" type="audio/mpeg">
+    </audio>
 
-  <div class="card">
-    <h1 id="question">Será que mereces um miminho especial? 💖</h1>
+    <audio id="noSound">
+        <source src="faaah.mp3" type="audio/mpeg">
+    </audio>
+    <div id="overlay" class="overlay"></div>
+    <div class="card">
+        <h1 id="question">Será que mereces um miminho especial? 💖</h1>
 
-    <div class="buttons" id="buttons">
-      <button id="yesBtn">Sim</button>
-      <button id="noBtn">Não</button>
+        <div class="buttons" id="buttons">
+            <button id="yesBtn">Sim</button>
+            <button id="noBtn">Não</button>
+        </div>
+
+        <p id="countdown" class="hidden"></p>
     </div>
 
-    <p id="countdown" class="hidden"></p>
-  </div>
+    <div id="hearts"></div>
 
-  <div id="hearts"></div>
-
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
+
 </html>
