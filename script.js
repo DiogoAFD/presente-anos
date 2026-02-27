@@ -168,21 +168,28 @@ function revealSurprise() {
 function showFinalVoucher() {
     const overlay = document.getElementById("overlay");
 
-    // 🔥 remover modo dramático
     overlay.classList.remove("active");
     question.classList.remove("dramatic");
 
     question.innerHTML =
         "Sabia 😌 Porque tu mereces um dia só para ti 💅💆‍♀️";
 
+    // Botão que força download
     buttons.innerHTML = `
-    <a href="GIFT Voucher 2875.pdf" download>
-      <button>🎁 Desbloquear Voucher</button>
-    </a>
-  `;
-
+      <button id="downloadBtn">🎁 Desbloquear Voucher</button>
+    `;
     buttons.classList.remove("hidden");
     createHearts();
+
+    // Download direto do GitHub Pages
+    document.getElementById("downloadBtn").addEventListener("click", () => {
+        const link = document.createElement("a");
+        link.href = "voucher.png"; // caminho relativo no repositório
+        link.download = "Voucher Especial.png"; // nome final do arquivo
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+    });
 }
 
 /* ===============================
