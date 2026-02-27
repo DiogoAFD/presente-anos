@@ -135,3 +135,53 @@ button {
 .envelope:hover {
     transform: scale(1.05);
 }
+
+/* ===============================
+   START SCREEN
+================================= */
+
+.start-screen {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, #ffe6f0, #fff5f9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.8s ease;
+}
+
+.start-screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.start-content {
+    text-align: center;
+}
+
+.start-content h1 {
+    margin-bottom: 20px;
+}
+
+#startBtn {
+    background-color: #ff66a3;
+    color: white;
+    font-size: 18px;
+    padding: 14px 28px;
+    border-radius: 14px;
+    transition: transform 0.3s ease;
+}
+
+#startBtn:hover {
+    transform: scale(1.08);
+}
+
+.start-content {
+    animation: fadeIn 1s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}

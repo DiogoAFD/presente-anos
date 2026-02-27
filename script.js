@@ -5,6 +5,47 @@ const buttons = document.getElementById("buttons");
 const countdownEl = document.getElementById("countdown");
 const music = document.getElementById("bgMusic");
 const noSound = document.getElementById("noSound");
+const swooshSound = document.getElementById("swooshSound");
+const startScreen = document.getElementById("startScreen");
+const startBtn = document.getElementById("startBtn");
+
+startBtn.addEventListener("click", () => {
+    unlockAudio(); // já tens esta função
+
+    // fade out suave
+    startScreen.classList.add("hidden");
+
+    setTimeout(() => {
+        startScreen.style.display = "none";
+    }, 800);
+});
+
+let audioUnlocked = false;
+
+function unlockAudio() {
+    if (audioUnlocked) return;
+
+    const sounds = [music, noSound, swooshSound];
+
+    sounds.forEach(sound => {
+        if (!sound) return;
+
+        try {
+            sound.volume = 0;
+            sound.play()
+                .then(() => {
+                    sound.pause();
+                    sound.currentTime = 0;
+                    sound.volume = 1;
+                })
+                .catch(() => {});
+        } catch (e) {}
+    });
+
+    audioUnlocked = true;
+}
+
+document.addEventListener("click", unlockAudio, { once: true });
 
 let escapeCount = 0;
 
@@ -27,6 +68,8 @@ noBtn.addEventListener("click", () => {
 });
 
 function moveNoButton() {
+    playSooshSound();
+
     const maxX = window.innerWidth - noBtn.offsetWidth - 20;
     const maxY = window.innerHeight - noBtn.offsetHeight - 20;
 
@@ -40,7 +83,7 @@ function moveNoButton() {
 
 function growYesButton() {
     const currentSize = window.getComputedStyle(yesBtn).fontSize;
-    const newSize = parseFloat(currentSize) + 4;
+    const newSize = parseFloat(currentSize) + 5;
     yesBtn.style.fontSize = newSize + "px";
 }
 
@@ -196,30 +239,28 @@ function showFinalVoucher() {
    CORAÇÕES
 ================================= */
 
+let heartInterval = null;
+
 function createHearts() {
     const heartsContainer = document.getElementById("hearts");
 
-    setTimeout(() => {
-        const heartInterval = setInterval(() => {
-            const heart = document.createElement("div");
-            heart.classList.add("heart");
-            heart.innerHTML = "💖";
-            heart.style.left = Math.random() * 100 + "vw";
-            heart.style.fontSize = Math.random() * 20 + 15 + "px";
+    // Evita criar vários intervals
+    if (heartInterval) return;
 
-            heartsContainer.appendChild(heart);
+    heartInterval = setInterval(() => {
+        const heart = document.createElement("div");
+        heart.classList.add("heart");
+        heart.innerHTML = "💖";
+        heart.style.left = Math.random() * 100 + "vw";
+        heart.style.fontSize = Math.random() * 20 + 15 + "px";
 
-            setTimeout(() => {
-                heart.remove();
-            }, 5000);
-
-        }, 200);
+        heartsContainer.appendChild(heart);
 
         setTimeout(() => {
-            clearInterval(heartInterval);
-        }, 6000);
+            heart.remove();
+        }, 5000);
 
-    }, 1500); // ligeiro delay para bater com a música
+    }, 300); // podes ajustar velocidade aqui
 }
 
 /* ===============================
@@ -229,6 +270,19 @@ function createHearts() {
 function playNoSound() {
     noSound.currentTime = 0;
     noSound.play().catch(() => { });
+}
+
+function playSooshSound() {
+     if (!swooshSound) {
+        console.log("Swoosh não encontrado");
+        return;
+    }
+
+    swooshSound.currentTime = 0;
+
+    swooshSound.play()
+        .then(() => console.log("Swoosh tocou"))
+        .catch(err => console.log("Erro:", err));
 }
 
 function vibrate(duration) {
