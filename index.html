@@ -7,14 +7,22 @@
 </head>
 <body>
 
+  <audio id="bgMusic" loop>
+    <source src="Noah Kahan - All My Love.mp3" type="audio/mpeg">
+  </audio>
+
   <div class="card">
     <h1 id="question">Será que mereces um miminho especial? 💖</h1>
 
-    <div class="buttons">
+    <div class="buttons" id="buttons">
       <button id="yesBtn">Sim</button>
       <button id="noBtn">Não</button>
     </div>
+
+    <p id="countdown" class="hidden"></p>
   </div>
+
+  <div id="hearts"></div>
 
   <script src="script.js"></script>
 </body>
