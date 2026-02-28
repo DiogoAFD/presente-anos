@@ -208,3 +208,56 @@ button {
     75% { transform: translateX(-5px); }
     100% { transform: translateX(0); }
 }
+
+#magicWord {
+    color: #ff3385;
+    font-weight: bold;
+    cursor: pointer;
+    position: relative;
+    z-index: 10;
+}
+
+#magicWord:hover {
+    text-decoration: underline;
+}
+
+.start-content {
+    position: relative;
+    transition: transform 0.2s ease;
+}
+
+#fakeBtn {
+    margin-top: 25px;
+    background-color: #ff66a3;
+    color: white;
+    font-size: 18px;
+    padding: 14px 28px;
+    border-radius: 14px;
+    transition: 0.2s ease;
+    position: relative;
+}
+
+#fakeBtn:hover {
+    transform: scale(1.05);
+}
+
+.feet-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.foot {
+    width: 120px;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.foot:hover {
+    transform: scale(1.05);
+}
+
+.foot.massage {
+    transform: scale(0.95) rotate(3deg);
+}

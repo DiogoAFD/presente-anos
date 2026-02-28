@@ -5,26 +5,134 @@ const countdownEl = document.getElementById("countdown");
 const music = document.getElementById("bgMusic");
 const noSound = document.getElementById("noSound");
 const swooshSound = document.getElementById("swooshSound");
+const ahhhSound = document.getElementById("ahhhSound");
+const yeySound = document.getElementById("yeySound");
+const popSound = document.getElementById("popSound");
 const startScreen = document.getElementById("startScreen");
-const startBtn = document.getElementById("startBtn");
+const startContent = document.getElementById("startContent");
+const fakeBtn = document.getElementById("fakeBtn");
 
-startBtn.addEventListener("click", () => {
+const realLink = document.getElementById("realLink");
+
+realLink.addEventListener("click", (e) => {
+    e.stopPropagation(); // evita conflitos
     unlockAudio();
 
-    // fade out suave
     startScreen.classList.add("hidden");
+
+    playYeySound();
+
+    startFootMassageStage();
 
     setTimeout(() => {
         startScreen.style.display = "none";
     }, 800);
 });
 
+// Ativar clique na palavra "aqui"
+startContent.addEventListener("click", (e) => {
+    if (e.target.textContent.trim() === "aqui") {
+        unlockAudio();
+
+        startScreen.classList.add("hidden");
+
+        setTimeout(() => {
+            startScreen.style.display = "none";
+        }, 800);
+    }
+});
+
+fakeBtn.addEventListener("mouseenter", () => {
+    moveFakeButton();
+    playSooshSound();
+});
+
+fakeBtn.addEventListener("click", () => {
+    moveFakeButton();
+});
+
+function setupFootLogic() {
+    let surpriseTriggered = false;
+
+    const leftFoot = document.getElementById("leftFoot");
+    const rightFoot = document.getElementById("rightFoot");
+    // const counterEl = document.getElementById("massageCounter");
+
+    let leftCount = 0;
+    let rightCount = 0;
+    const required = 10;
+
+    // function updateCounter() {
+    //     counterEl.textContent = `${leftCount + rightCount} / 20 massagens`;
+    // }
+
+    function checkCompletion() {
+        if (
+            leftCount >= required &&
+            rightCount >= required &&
+            !surpriseTriggered
+        ) {
+            surpriseTriggered = true;
+
+            leftFoot.style.pointerEvents = "none";
+            rightFoot.style.pointerEvents = "none";
+
+            setTimeout(() => {
+                startExtraChallenge();
+                // startCountdown();
+            }, 600);
+        }
+    }
+
+    function handleClick(foot, side) {
+        foot.classList.add("massage");
+
+        setTimeout(() => {
+            foot.classList.remove("massage");
+        }, 200);
+
+        if (side === "left" && leftCount < required) {
+            leftCount++;
+        }
+
+        if (side === "right" && rightCount < required) {
+            rightCount++;
+        }
+
+        // updateCounter();
+        checkCompletion();
+    }
+
+    leftFoot.addEventListener("click", () => {
+        handleClick(leftFoot, "left");
+        playAhhhSound();
+    });
+    rightFoot.addEventListener("click", () => {
+        handleClick(rightFoot, "right");
+        playAhhhSound();
+    });
+
+    // updateCounter();
+}
+
+function moveFakeButton() {
+    const maxX = window.innerWidth - fakeBtn.offsetWidth - 20;
+    const maxY = window.innerHeight - fakeBtn.offsetHeight - 20;
+
+    const x = Math.random() * maxX;
+    const y = Math.random() * maxY;
+
+    fakeBtn.style.position = "fixed";
+    fakeBtn.style.left = `${x}px`;
+    fakeBtn.style.top = `${y}px`;
+}
+
 let audioUnlocked = false;
 
 function unlockAudio() {
     if (audioUnlocked) return;
 
-    const sounds = [music, noSound, swooshSound];
+    const sounds = [music, noSound, swooshSound, ahhhSound];
 
     sounds.forEach(sound => {
         if (!sound) return;
@@ -46,163 +154,27 @@ function unlockAudio() {
 
 document.addEventListener("click", unlockAudio, { once: true });
 
-let escapeCount = 0;
-
 function growYesButton() {
     const currentSize = window.getComputedStyle(yesBtn).fontSize;
     const newSize = parseFloat(currentSize) + 5;
     yesBtn.style.fontSize = newSize + "px";
 }
 
-/* ===============================
-   BOTÃO SIM → QUIZ
-================================= */
-
-let escapeSimCount = 0;
-const maxEscapeSim = 7; // Depois de 7 tentativas, o botão para de fugir
-
-yesBtn.addEventListener("mouseenter", () => {
-    if (escapeSimCount < maxEscapeSim) {
-        moveYesButton();
-        growYesButton();
-        playSooshSound();
-        escapeSimCount++;
-    }
-});
-
-yesBtn.addEventListener("click", () => {
-    if (escapeSimCount >= maxEscapeSim) {
-        startQuiz(); // Avança para o quiz normalmente
-    } else {
-        question.innerHTML = "Quase lá 😏 tenta outra vez!";
-        vibrate(150);
-    }
-});
-
-function moveYesButton() {
-    const maxX = window.innerWidth - yesBtn.offsetWidth - 20;
-    const maxY = window.innerHeight - yesBtn.offsetHeight - 20;
-
-    const x = Math.random() * maxX;
-    const y = Math.random() * maxY;
-
-    yesBtn.style.position = "fixed";
-    yesBtn.style.left = `${x}px`;
-    yesBtn.style.top = `${y}px`;
-}
-
-function startQuiz() {
-    question.innerHTML = "Pergunta importante... quem merece esta prenda? 😌";
-
-    buttons.innerHTML = `
-        <button class="quizOption correct" style="background-color: #4CAF50; color: white;">Eu obviamente 💅</button>
-        <button class="quizOption funny" style="background-color: #ff66a3; color: white;">O meu incrível namorado 😎</button>
-        <button class="quizOption playful" style="background-color: #ffcc66; color: black;">Eu outra vez porque quem mais haveria de ser... 😏</button>
+function startFootMassageStage() {
+    question.innerHTML = `
+        Muito bem, às vezes as coisas não são o que parecem 👀.<br><br>
+        Agora só tens de massajar os meus pés para receberes a tua prenda 🦶✨
     `;
 
-    let playfulEscapes = 0;
-    const maxPlayfulEscapes = 5;
-
-    document.querySelectorAll(".quizOption").forEach(btn => {
-        btn.addEventListener("click", (e) => {
-            if (e.target.classList.contains("correct")) {
-                // Antes de avançar, faz o botão tremer
-                e.target.style.animation = "shake 0.5s";
-                setTimeout(() => {
-                    e.target.style.animation = "";
-                    stageTwo();
-                }, 500);
-            }
-            else if (e.target.classList.contains("funny")) {
-                // Explode visualmente
-                explodeBoyfriendButton(e.target);
-                playNoSound();
-            }
-            else if (e.target.classList.contains("playful")) {
-                if (playfulEscapes < maxPlayfulEscapes) {
-                    // Pula para outro lugar
-                    movePlayfulButton(e.target);
-                    playSooshSound();
-                    playfulEscapes++;
-                    question.innerHTML = "Ahah 😏 quase apanhas-te!";
-                } else {
-                    // Agora fica clicável
-                    question.innerHTML = "Ok, agora podes clicar!";
-                    e.target.style.position = "static";
-                    e.target.style.left = "";
-                    e.target.style.top = "";
-                }
-            }
-        });
-    });
-}
-
-function movePlayfulButton(btn) {
-    const maxX = window.innerWidth - btn.offsetWidth - 20;
-    const maxY = window.innerHeight - btn.offsetHeight - 20;
-
-    const x = Math.random() * maxX;
-    const y = Math.random() * maxY;
-
-    btn.style.position = "fixed";
-    btn.style.left = `${x}px`;
-    btn.style.top = `${y}px`;
-}
-
-function explodeBoyfriendButton(btn) {
-    if (!btn || btn.classList.contains("exploding")) return;
-
-    question.innerHTML = "Resposta errada 👀 tenta outra vez.";
-
-    btn.classList.add("exploding");
-    btn.disabled = true;
-
-    let scale = 1;
-
-    const grow = setInterval(() => {
-        scale += 0.15;
-        btn.style.transform = `scale(${scale})`;
-
-        if (scale >= 3) {
-            clearInterval(grow);
-
-            btn.style.transition = "0.3s ease";
-            btn.style.opacity = "0";
-            btn.style.transform = "scale(4)";
-
-            setTimeout(() => {
-                btn.remove();
-            }, 300);
-        }
-    }, 80);
-}
-
-/* ===============================
-   ETAPAS INTERMÉDIAS
-================================= */
-
-function stageTwo() {
-    question.innerHTML = "Mas espera... tens a certeza que mereces MESMO? 😏";
-
     buttons.innerHTML = `
-    <button id="proveBtn">Provar que sim 💅</button>
-  `;
+        <div class="feet-container">
+            <img src="pe_esquerdo.jpeg" id="leftFoot" class="foot" />
+            <img src="pe_direito.jpeg" id="rightFoot" class="foot" />
+        </div>
+        
+    `;
 
-    document.getElementById("proveBtn")
-        .addEventListener("click", stageThree);
-}
-
-function stageThree() {
-    question.innerHTML = "Última pergunta importante...";
-
-    buttons.innerHTML = `
-    <button id="finalBtn">
-      Aceitar oficialmente que sou incrível ✨
-    </button>
-  `;
-
-    document.getElementById("finalBtn")
-        .addEventListener("click", startCountdown);
+    setupFootLogic();
 }
 
 /* ===============================
@@ -210,7 +182,11 @@ function stageThree() {
 ================================= */
 
 function startCountdown() {
+
     const overlay = document.getElementById("overlay");
+
+    question.innerHTML = "A preparar surpresa em... 3";
+
     overlay.classList.add("active");
     question.classList.add("dramatic");
 
@@ -348,8 +324,103 @@ function playSooshSound() {
         .catch(err => console.log("Erro:", err));
 }
 
+function playAhhhSound() {
+    if (!ahhhSound) {
+        console.log("Ahhh não encontrado");
+        return;
+    }
+
+    ahhhSound.currentTime = 0;
+
+    ahhhSound.play()
+        .then(() => console.log("Ahhh tocou"))
+        .catch(err => console.log("Erro:", err));
+}
+
+function playYeySound() {
+    if (!yeySound) {
+        console.log("Yey não encontrado");
+        return;
+    }
+
+    yeySound.currentTime = 0;
+
+    yeySound.play()
+        .then(() => console.log("Yey tocou"))
+        .catch(err => console.log("Erro:", err));
+}
+
+function playPopSound() {
+    if (!popSound) {
+        console.log("Pop não encontrado");
+        return;
+    }
+
+    popSound.currentTime = 0;
+
+    popSound.play()
+        .then(() => console.log("Pop tocou"))
+        .catch(err => console.log("Erro:", err));
+}
+
 function vibrate(duration) {
     if (navigator.vibrate) {
         navigator.vibrate(duration);
     }
+}
+
+function startExtraChallenge() {
+    question.innerHTML = "Último desafio... apanha todos os corações 💖 em 10s!";
+    buttons.innerHTML = `<div id="challengeArea" class="challenge-area"></div>`;
+
+    const challengeArea = document.getElementById("challengeArea");
+    const totalHearts = 5;
+    let caughtHearts = 0;
+    const timeLimit = 10000; // 10 segundos
+
+    // Cria corações
+    for (let i = 0; i < totalHearts; i++) {
+        const heart = document.createElement("div");
+        heart.classList.add("runaway-heart");
+        heart.innerHTML = "💖";
+        heart.style.fontSize = `${15 + Math.random() * 20}px`;
+        heart.style.transition = "left 0.3s ease, top 0.3s ease"; // animação suave
+        challengeArea.appendChild(heart);
+
+        heart.addEventListener("mouseenter", () => {
+            if (!heart.clicked) {
+                setTimeout(() => moveHeart(heart), 150); // pequena pausa antes de fugir
+            }
+        });
+        heart.addEventListener("click", () => {
+            heart.clicked = true; // marca como clicado
+            heart.remove();
+            caughtHearts++;
+            playPopSound();
+
+            if (caughtHearts === totalHearts) {
+                clearTimeout(timer);
+                startCountdown();
+            }
+        });
+    }
+
+    // Tempo limite
+    const timer = setTimeout(() => {
+        alert("Ups! Tempo esgotado 😅, tenta de novo.");
+        startExtraChallenge(); // reinicia o desafio
+    }, timeLimit);
+}
+
+// Função para mover o coração para posição aleatória
+function moveHeart(heart) {
+    const maxX = window.innerWidth - heart.offsetWidth - 20;
+    const maxY = window.innerHeight - heart.offsetHeight - 20;
+
+    const x = Math.random() * maxX;
+    const y = Math.random() * maxY;
+
+    heart.style.position = "fixed";
+    heart.style.left = `${x}px`;
+    heart.style.top = `${y}px`;
 }

@@ -21,10 +21,26 @@
         <source src="swoosh.mp3" type="audio/mpeg">
     </audio>
 
+    <audio id="ahhhSound">
+        <source src="turtle-make-love.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="yeySound">
+        <source src="yey.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="popSound">
+        <source src="pop.mp3" type="audio/mpeg">
+    </audio>
+
     <div id="startScreen" class="start-screen">
-        <div class="start-content">
-            <h1>Tenho uma coisa para ti 💖</h1>
-            <button id="startBtn">Toca para começar</button>
+        <div class="start-content" id="startContent">
+            <h1>
+                Feliz aniversário 💛 <br><br>
+                Clica <span id="realLink">aqui</span> para receberes a tua prenda 🎁
+            </h1>
+
+            <button id="fakeBtn">Receber Prenda</button>
         </div>
     </div>
     <div id="overlay" class="overlay"></div>
@@ -33,7 +49,6 @@
 
         <div class="buttons" id="buttons">
             <button id="yesBtn">Sim</button>
-            <!-- <button id="noBtn">Não</button> -->
         </div>
 
         <p id="countdown" class="hidden"></p>
