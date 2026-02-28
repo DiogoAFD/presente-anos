@@ -163,27 +163,29 @@ function startExtraChallenge() {
     const timeLimit = 10000; // 10s
 
     for (let i = 0; i < totalHearts; i++) {
-        const heart = document.createElement("div");
-        heart.classList.add("runaway-heart");
-        heart.innerHTML = "💖";
-        heart.style.fontSize = `${15 + Math.random() * 20}px`;
-        heart.style.transition = "left 0.3s ease, top 0.3s ease";
-        challengeArea.appendChild(heart);
+        setTimeout(() => {
+            const heart = document.createElement("div");
+            heart.classList.add("runaway-heart");
+            heart.innerHTML = "💖";
+            heart.style.fontSize = `${15 + Math.random() * 20}px`;
+            heart.style.transition = "left 0.3s ease, top 0.3s ease";
+            challengeArea.appendChild(heart);
 
-        ["mouseenter", "touchstart"].forEach(ev => {
-            heart.addEventListener(ev, () => { if (!heart.clicked) setTimeout(() => moveHeart(heart), 150); });
-        });
-
-        ["click", "touchstart"].forEach(ev => {
-            heart.addEventListener(ev, () => {
-                if (heart.clicked) return;
-                heart.clicked = true;
-                heart.remove();
-                caughtHearts++;
-                playPopSound();
-                if (caughtHearts === totalHearts) clearTimeout(timer), startCountdown();
+            ["mouseenter", "touchstart"].forEach(ev => {
+                heart.addEventListener(ev, () => { if (!heart.clicked) setTimeout(() => moveHeart(heart), 150); });
             });
-        });
+
+            ["click", "touchstart"].forEach(ev => {
+                heart.addEventListener(ev, () => {
+                    if (heart.clicked) return;
+                    heart.clicked = true;
+                    heart.remove();
+                    caughtHearts++;
+                    playPopSound();
+                    if (caughtHearts === totalHearts) clearTimeout(timer), startCountdown();
+                });
+            });
+        }, i * 500); // cada coração aparece meio segundo depois do anterior
     }
 
     const timer = setTimeout(() => {
